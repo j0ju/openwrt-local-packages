@@ -1,0 +1,21 @@
+diff -uaNr mpd-0.18.23.o/src/input/CurlInputPlugin.cxx mpd-0.18.23/src/input/CurlInputPlugin.cxx
+--- mpd-0.18.23.o/src/input/CurlInputPlugin.cxx	2016-01-08 16:43:17.801707823 +0100
++++ mpd-0.18.23/src/input/CurlInputPlugin.cxx	2016-01-08 16:56:08.031682179 +0100
+@@ -974,9 +974,15 @@
+ 		return false;
+ 	}
+ 
++  char *user_agent = NULL;
++  user_agent = getenv("MPD_USER_AGENT");
++  if (!user_agent) {
++			 user_agent = "Mozilla/5.0 (X11; Linux x86_64; en_US) AppleWebKit/534.34 (KHTML, like Gecko) konqueror/4.14.2 Safari/534.34 " VERSION;
++			 // user_agent = "Music Player Demon " VERSION;
++  }
++
+ 	curl_easy_setopt(c->easy, CURLOPT_PRIVATE, (void *)c);
+-	curl_easy_setopt(c->easy, CURLOPT_USERAGENT,
+-			 "Music Player Daemon " VERSION);
++	curl_easy_setopt(c->easy, CURLOPT_USERAGENT, user_agent);
+ 	curl_easy_setopt(c->easy, CURLOPT_HEADERFUNCTION,
+ 			 input_curl_headerfunction);
+ 	curl_easy_setopt(c->easy, CURLOPT_WRITEHEADER, c);
