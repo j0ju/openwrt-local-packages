@@ -1,0 +1,11 @@
+diff -uaNr autofs-5.1.1.o/lib/Makefile autofs-5.1.1/lib/Makefile
+--- autofs-5.1.1.o/lib/Makefile	2015-04-21 11:37:45.000000000 +0200
++++ autofs-5.1.1/lib/Makefile	2015-10-16 22:18:57.043951424 +0200
+@@ -52,7 +52,6 @@
+ 
+ mount_xdr.o: mount_xdr.c
+ 	$(CC) $(CFLAGS) -Wno-unused-variable -o mount_xdr.o -c mount_xdr.c
+-	$(STRIP) mount_xdr.o
+ 
+ master_tok.c: master_tok.l
+ 	$(LEX) -o$@ -Pmaster_ $?

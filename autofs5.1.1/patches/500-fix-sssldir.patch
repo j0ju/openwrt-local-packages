@@ -1,0 +1,20 @@
+Last-Update: 2014-04-05
+Forwarded: yes
+From: Timo Aaltonen <tjaalton@ubuntu.com>
+Description: Check the multiarch lib path when searching for "libsss_autofs.so".
+
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -37,9 +37,9 @@ dnl
+ dnl Check if a sss autofs library exists.
+ dnl --------------------------------------------------------------------------
+ AC_DEFUN(AF_CHECK_SSS_LIB,
+-[if test -z "$sssldir"; then
+-  AC_MSG_CHECKING(for sssd autofs library)
+-  for libd in /usr/lib64 /usr/lib; do
++[AC_MSG_CHECKING(for sssd autofs library)
++if test -z "$sssldir"; then
++  for libd in /usr/lib64 /usr/lib "$multiarch"; do
+     if test -z "$sssldir"; then
+       if test -e "$libd/sssd/modules/$2"; then
+         sssldir=$libd/sssd/modules

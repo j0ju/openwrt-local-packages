@@ -1,0 +1,18 @@
+From: Jan Christoph Nordholz <hesso@pool.math.tu-berlin.de>
+Description: Add an example line for nfsv4 environments.
+
+--- a/samples/auto.net
++++ b/samples/auto.net
+@@ -8,9 +8,12 @@
+ key="$1"
+ 
+ # add "nosymlink" here if you want to suppress symlinking local filesystems
+ # add "nonstrict" to make it OK for some filesystems to not mount
++# choose one of the two lines below depending on the NFS version in your
++# environment
+ opts="-fstype=nfs,hard,intr,nodev,nosuid"
++#opts="-fstype=nfs4,hard,intr,nodev,nosuid,async"
+ 
+ for P in /bin /sbin /usr/bin /usr/sbin
+ do
+ 	for M in showmount kshowmount

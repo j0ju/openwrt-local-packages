@@ -1,0 +1,84 @@
+Last-Update: 2014-03-07
+Forwarded: yes
+From: Michael Tokarev <mjt@tls.msk.ru>
+Subject: do not check for modprobe or procfs or load module
+
+Loading autofs module is #ifdef'ed in the source, so
+there is no need to check for /proc (which is only used
+to load module) or modprobe.  Both modprobe and /proc
+are always in the fixed location so there's no need to
+check for these to start with.
+
+--- a/configure.in
++++ b/configure.in
+@@ -33,13 +33,8 @@
+ AC_MSG_CHECKING([for binaries in])
+ AC_MSG_RESULT([$searchpath])
+ 
+ #
+-# Make sure we have "/proc"
+-#
+-AF_LINUX_PROCFS()
+-
+-#
+ # Location of init.d directory?
+ #
+ AF_INIT_D()
+ AC_SUBST(initdir)
+@@ -141,9 +136,8 @@
+ AF_PATH_INCLUDE(UMOUNT, umount, /bin/umount, $searchpath)
+ AF_PATH_INCLUDE(E2FSCK, fsck.ext2 e2fsck, , $searchpath)
+ AF_PATH_INCLUDE(E3FSCK, fsck.ext3 e3fsck, , $searchpath)
+ AF_PATH_INCLUDE(E4FSCK, fsck.ext4 e4fsck, , $searchpath)
+-AF_PATH_INCLUDE(MODPROBE, modprobe, , $searchpath)
+ 
+ AF_CHECK_PROG(LEX, flex lex, , $searchpath)
+ AF_CHECK_PROG(YACC, bison, , $searchpath)
+ AF_CHECK_PROG(RANLIB, ranlib, , $searchpath)
+--- a/daemon/module.c
++++ b/daemon/module.c
+@@ -17,8 +17,10 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include "automount.h"
+ 
++#if 0
++/* see comment in daemon/automount.c around load_autofs4_module() call */
+ int load_autofs4_module(void)
+ {
+ 	FILE *fp;
+ 	char buf[PATH_MAX];
+@@ -51,8 +53,9 @@
+ 		return 0;
+ 
+ 	return 1;
+ }
++#endif
+ 
+ struct lookup_mod *open_lookup(const char *name, const char *err_prefix,
+ 			       const char *mapfmt, int argc, const char *const *argv)
+ {
+--- a/include/automount.h
++++ b/include/automount.h
+@@ -50,18 +50,13 @@
+ #ifndef HAVE_UMOUNT
+ #error Failed to locate umount(8)!
+ #endif
+ 
+-#ifndef HAVE_MODPROBE
+-#error Failed to locate modprobe(8)!
+-#endif
+-
+-#ifndef HAVE_LINUX_PROCFS
+-#error Failed to verify existence of procfs filesystem!
+-#endif
+-
++#if 0
++/* see comment in daemon/automount.c around load_autofs4_module() call */
+ #define FS_MODULE_NAME  "autofs4"
+ int load_autofs4_module(void);
++#endif
+ 
+ /* The -s (sloppy) option to mount is good, if we have it... */
+ 
+ #ifdef HAVE_SLOPPY_MOUNT

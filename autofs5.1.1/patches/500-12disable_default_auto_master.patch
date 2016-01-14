@@ -1,0 +1,26 @@
+From: Jan Christoph Nordholz <hesso@pool.math.tu-berlin.de>
+Description:
+ Disable upstream's default of activating /mnt and /net.
+ In previous versions this was done as a security measure
+ (because the hosts map was processed without nosuid and nodev).
+
+--- a/samples/auto.master
++++ b/samples/auto.master
+@@ -3,15 +3,15 @@
+ # This is a 'master' automounter map and it has the following format:
+ # mount-point [map-type[,format]:]map [options]
+ # For details of the format look at auto.master(5).
+ #
+-/misc	/etc/auto.misc
++#/misc	/etc/auto.misc
+ #
+ # NOTE: mounts done from a hosts map will be mounted with the
+ #	"nosuid" and "nodev" options unless the "suid" and "dev"
+ #	options are explicitly given.
+ #
+-/net	-hosts
++#/net	-hosts
+ #
+ # Include /etc/auto.master.d/*.autofs
+ # The included files must conform to the format of this file.
+ #

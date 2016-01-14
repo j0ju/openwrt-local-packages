@@ -1,0 +1,107 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2011 OpenWrt.org
+
+START=50
+
+PIDFILE=/var/run/automount.pid
+
+OPTS=
+OPTS="$OPTS -t 60"
+OPTS="$OPTS -p $PIDFILE"
+OPTS="$OPTS -C"
+OPTS="$OPTS -f"
+
+EXTRA_COMMANDS=
+EXTRA_COMMANDS="$EXTRA_COMMANDS force_stop cleanup"
+
+BIN=/usr/sbin/automount
+
+USE_PROCD=1
+
+prepare() {
+	mkdir -p /var/run/automount
+	mkdir -p $(awk '/^\//  {print $1}' /etc/auto.master)
+	if ! grep autofs /proc/filesystems > /dev/null; then
+		insmod autofs 2> /dev/null || \ 
+		insmod autofs4 2> /dev/null || \
+		insmod autofs5 2> /dev/null
+		if ! grep autofs /proc/filesystems; then
+			echo "no autofs support in kernel."
+			exit
+		fi
+	fi
+}
+
+start_service()
+{
+    prepare
+    echo "${initscript##*/}[$$]: starting automount ..."
+	    
+    procd_open_instance
+	if which chpst > /dev/null; then
+	  OPTS="$BIN $OPTS"
+	  BIN="$(which chpst) -0 -1 -2 -P"
+	fi
+    procd_set_param command $BIN
+    procd_append_param command $OPTS
+    #procd_set_param respawn
+	procd_close_instance
+}
+
+stop_service() {
+    echo "${initscript##*/}[$$]: stopping automount ..."
+	for shutdown in \
+	  grace grace grace \
+	  force \
+	  ;
+	do
+		if [ "$shutdown" = grace ]; then
+			if pidof automount > /dev/null; then
+				signal=15 # TERM
+			else
+				break
+			fi
+		else
+			echo
+			signal=9 # KILL
+		fi
+		cleanup $signal
+		sleep 1
+	done
+}
+
+reload_service() {
+	killall -HUP automount
+}
+
+cleanup() {
+	cd /
+	trap : HUP
+	signal="$1"
+	while read map autofs_mountpoint fstyp opts foo; do
+		[ "$fstyp" = autofs ] || continue
+
+		autofs_mountpoint="${autofs_mountpoint%/}"
+
+		while read dev mountpoint fstyp opts foo; do
+			case "$mountpoint" in
+				"$autofs_mountpoint"/* ) 
+					echo "$initscript[$$]: kill -$signal $(fuser -$signal -k -m "$mountpoint" 2> /dev/null)"
+					echo "$initscript[$$]: umount $mountpoint"
+					umount "$mountpoint" 2> /dev/null
+				;;
+			esac
+		done
+		mountpoint="$autofs_mountpoint"
+		echo "$initscript[$$]: kill -$signal $(fuser -$signal -k -m "$mountpoint" 2> /dev/null)"
+		if read pid < "$PIDFILE"; then
+			kill -$signal $pid 2> /dev/null
+			echo "$initscript[$$]: kill -$signal $pid # automount"
+		fi
+		echo "$initscript[$$]: umount $autofs_mountpoint"
+		umount "$mountpoint" 2> /dev/null
+	done < /proc/mounts
+	rm -f "$PIDFILE"
+}
+
+#[ -n "$initscript" -a -L "$initscript" ] && exec "$(readlink -f "$initscript")" ${action:+"$action"} "$@"

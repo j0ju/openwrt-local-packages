@@ -1,0 +1,115 @@
+Last-Update: 2014-03-07
+Forwarded: yes
+Bug-Debian: http://bugs.debian.org/678555
+Bug-Ubuntu: http://pad.lv/1016673
+From: Michael Tokarev <mjt@tls.msk.ru>
+Subject: remove kernel and mount.nfs version check
+
+autofs daemon checks for kernel and mount.nfs versions and uses
+slightly different code if kernel is older than 2.6.22 or mount.nfs
+does not use string options.  Both cases are of very old, pre-squeeze,
+versions.
+
+But because automount spawns mount.nfs at startup, this interferes
+with systemd and upstart daemon pid tracking mechanism (they track
+pid of mount.nfs, not automount as a result).  Fix this by removing
+the check entirely.
+
+Note that for current Debian and Ubuntu versions, no versioned Breaks
+are necessary.
+
+The patch is based on a similar patch by Dmitrijs Ledkovs.
+
+--- a/daemon/automount.c
++++ b/daemon/automount.c
+@@ -50,11 +50,8 @@
+ const char *libdir = AUTOFS_LIB_DIR;	/* Location of library modules */
+ const char *mapdir = AUTOFS_MAP_DIR;	/* Location of mount maps */
+ const char *confdir = AUTOFS_CONF_DIR;	/* Location of autofs config file */
+ 
+-unsigned int nfs_mount_uses_string_options = 0;
+-static struct nfs_mount_vers vers, check = {1, 1, 1};
+-
+ /* autofs fifo name prefix */
+ const char *fifodir = AUTOFS_FIFO_DIR "/autofs.fifo";
+ 
+ const char *global_options;		/* Global option, from command line */
+@@ -1372,10 +1369,8 @@
+ 	status = pthread_mutex_lock(&mrc.mutex);
+ 	if (status)
+ 		fatal(status);
+ 
+-	nfs_mount_uses_string_options = check_nfs_mount_version(&vers, &check);
+-
+ 	master_mutex_lock();
+ 	/* Already doing a map read or shutdown or no mounts */
+ 	if (master->reading) {
+ 		status = pthread_mutex_unlock(&mrc.mutex);
+@@ -2039,10 +2034,8 @@
+ 	program = argv[0];
+ 
+ 	defaults_read_config(0);
+ 
+-	nfs_mount_uses_string_options = check_nfs_mount_version(&vers, &check);
+-
+ 	kpkt_len = get_kpkt_len();
+ 	timeout = defaults_get_timeout();
+ 	ghost = defaults_get_browse_mode();
+ 	logging = defaults_get_logging();
+--- a/include/mounts.h
++++ b/include/mounts.h
+@@ -70,16 +70,9 @@
+ 	struct list_head sublist;
+ };
+ 
+ 
+-struct nfs_mount_vers {
+-	unsigned int major;
+-	unsigned int minor;
+-	unsigned int fix;
+-};
+ unsigned int linux_version_code(void);
+-int check_nfs_mount_version(struct nfs_mount_vers *, struct nfs_mount_vers *);
+-extern unsigned int nfs_mount_uses_string_options;
+ 
+ struct amd_entry;
+ 
+ struct substvar *addstdenv(struct substvar *sv, const char *prefix);
+--- a/modules/replicated.c
++++ b/modules/replicated.c
+@@ -691,11 +691,10 @@
+ 	 * greater than 2.6.22 and mount.nfs version is greater than 1.1.1.
+ 	 * But also allow the MOUNT_WAIT configuration parameter to override
+ 	 * the probing.
+ 	 */
+-	if (nfs_mount_uses_string_options &&
+-	    defaults_get_mount_wait() == -1 &&
+-	   (kern_vers = linux_version_code()) > KERNEL_VERSION(2, 6, 22)) {
++	/* we assume kernel and mount.nfs are recent enough */
++	if (defaults_get_mount_wait() == -1) {
+ 		if (!this)
+ 			return 1;
+ 	} else {
+ 		if (!this || !this->next)
+--- a/lib/mounts.c
++++ b/lib/mounts.c
+@@ -189,8 +189,9 @@
+ {
+ 	return kver.minor;
+ }
+ 
++#if 0
+ #ifdef HAVE_MOUNT_NFS
+ static int extract_version(char *start, struct nfs_mount_vers *vers)
+ {
+ 	char *s_ver = strchr(start, ' ');
+@@ -327,8 +328,9 @@
+ {
+ 	return 0;
+ }
+ #endif
++#endif
+ 
+ static char *set_env_name(const char *prefix, const char *name, char *buf)
+ {
+ 	size_t len;
