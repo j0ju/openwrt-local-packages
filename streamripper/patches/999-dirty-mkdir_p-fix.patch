@@ -1,0 +1,12 @@
+diff -uaNr streamripper-1.62.0.o/Makefile.in streamripper-1.62.0/Makefile.in
+--- streamripper-1.62.0.o/Makefile.in	2015-10-16 17:40:12.000000000 +0200
++++ streamripper-1.62.0/Makefile.in	2015-10-16 17:45:24.221435928 +0200
+@@ -213,7 +213,7 @@
+ localedir = @localedir@
+ localstatedir = @localstatedir@
+ mandir = @mandir@
+-mkdir_p = @mkdir_p@
++mkdir_p = mkdir -p
+ oldincludedir = @oldincludedir@
+ pdfdir = @pdfdir@
+ prefix = @prefix@
