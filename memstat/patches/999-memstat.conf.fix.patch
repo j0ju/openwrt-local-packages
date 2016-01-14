@@ -1,0 +1,20 @@
+diff -uaNr memstattool.o/memstat.conf memstattool/memstat.conf
+--- memstattool.o/memstat.conf	2011-01-31 11:58:33.000000000 +0100
++++ memstattool/memstat.conf	2013-05-10 13:25:48.926455000 +0200
+@@ -3,12 +3,13 @@
+ /usr/bin
+ /usr/local/bin
+ /usr/X11R6/bin
++/opt/bin
+ /lib
+ /usr/lib
+ /usr/local/lib
+ /usr/X11R6/lib
++/opt/lib
+ /sbin
+ /usr/sbin
+ /usr/local/sbin
+-/lib/libc5-compat
+-/usr/lib/libc5-compat
+\ No newline at end of file
++/opt/sbin
