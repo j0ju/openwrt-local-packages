@@ -1,0 +1,13 @@
+diff -uaNr tinysid-0.94.o/makefile tinysid-0.94/makefile
+--- tinysid-0.94.o/makefile	2006-05-08 22:56:40.000000000 +0200
++++ tinysid-0.94/makefile	2013-04-18 00:09:31.046343000 +0200
+@@ -1,9 +1,5 @@
+ # TinySID makefile
+-DEFS = -Wall
+-CFLAGS = $(DEFS) -O
+-LDFLAGS =
+ LIBS = -lpthread
+-CC = gcc
+ 
+ OBJECTS_A = tinysid.o sidengine.o soundcard.o
+ 
