@@ -1,0 +1,13 @@
+Index: incron-0.5.10/ict-main.cpp
+===================================================================
+--- incron-0.5.10.orig/ict-main.cpp
++++ incron-0.5.10/ict-main.cpp
+@@ -18,7 +18,7 @@
+  */
+ 
+ 
+-#include <argp.h>
++#include <errno.h>
+ #include <pwd.h>
+ #include <string>
+ #include <unistd.h>
