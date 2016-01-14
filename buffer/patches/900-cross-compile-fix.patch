@@ -1,0 +1,40 @@
+diff -uaNr buffer-1.19.o/Makefile buffer-1.19/Makefile
+--- buffer-1.19.o/Makefile	2001-04-05 21:53:57.000000000 +0200
++++ buffer-1.19/Makefile	2013-04-28 17:24:55.924865000 +0200
+@@ -9,17 +9,7 @@
+ # Add -DAMPEX to change the default settings suitable for the high capacity
+ #   Ampex drives, such as the DST 310.
+ 
+-CC=gcc
+-CFLAGS=-Wall
+-
+-# Where to install buffer and its manual pages
+-INSTBIN=/usr/local/bin
+-INSTMAN=/usr/man/manl
+-# The manual page section (normally l or 1)
+-S=l
+-
+ RM=/bin/rm
+-ALL=README buffer.man Makefile buffer.c sem.c sem.h COPYING
+ 
+ all: buffer
+ 
+@@ -29,18 +19,3 @@
+ clean:
+ 	$(RM) -f *.o core buffer .merrs
+ 
+-install: buffer
+-	rm -f $(INSTBIN)/buffer
+-	cp buffer $(INSTBIN)/buffer
+-	chmod 111 $(INSTBIN)/buffer
+-	rm -f $(INSTMAN)/buffer.$S
+-	cp buffer.man $(INSTMAN)/buffer.$S
+-	chmod 444 $(INSTMAN)/buffer.$S
+-
+-buffer.tar: $(ALL)
+-	$(RM) -f buffer.tar
+-	tar cvf buffer.tar $(ALL)
+-
+-buffer.shar: $(ALL)
+-	$(RM) -f buffer.shar
+-	shar $(ALL) > buffer.shar
