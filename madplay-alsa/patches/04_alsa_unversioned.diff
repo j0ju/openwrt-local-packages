@@ -1,0 +1,82 @@
+diff -uaNr madplay-0.15.2b.o/audio_alsa.c madplay-0.15.2b/audio_alsa.c
+--- madplay-0.15.2b.o/audio_alsa.c	2004-02-23 22:35:23.000000000 +0100
++++ madplay-0.15.2b/audio_alsa.c	2012-10-19 20:09:57.502356616 +0200
+@@ -28,8 +28,6 @@
+ 
+ #include <errno.h>
+ 
+-#define ALSA_PCM_OLD_HW_PARAMS_API
+-#define ALSA_PCM_OLD_SW_PARAMS_API
+ #include <alsa/asoundlib.h>
+ 
+ #include <mad.h>
+diff -uaNr madplay-0.15.2b.o/audio_alsa.c madplay-0.15.2b/audio_alsa.c
+--- madplay-0.15.2b.o/audio_alsa.c	2012-10-19 20:22:46.598326319 +0200
++++ madplay-0.15.2b/audio_alsa.c	2012-10-19 20:46:59.550269083 +0200
+@@ -85,7 +85,7 @@
+ 		return err;
+ 	}
+ 	/* set the stream rate */
+-	err = snd_pcm_hw_params_set_rate_near(handle, params, rate, 0);
++	err = snd_pcm_hw_params_set_rate_near(handle, params, &rate, 0);
+ 	if (err < 0) {
+ 		printf("Rate %iHz not available for playback: %s\n", rate, snd_strerror(err));
+ 		return err;
+@@ -95,19 +95,19 @@
+ 		return -EINVAL;
+ 	}
+ 	/* set buffer time */
+-	err = snd_pcm_hw_params_set_buffer_time_near(handle, params, buffer_time, &dir);
++	err = snd_pcm_hw_params_set_buffer_time_near(handle, params, &buffer_time, &dir);
+ 	if (err < 0) {
+ 		printf("Unable to set buffer time %i for playback: %s\n", buffer_time, snd_strerror(err));
+ 		return err;
+ 	}
+-	buffer_size = snd_pcm_hw_params_get_buffer_size(params);
++	snd_pcm_hw_params_get_buffer_size(params, &buffer_size);
+ 	/* set period time */
+-	err = snd_pcm_hw_params_set_period_time_near(handle, params, period_time, &dir);
++	err = snd_pcm_hw_params_set_period_time_near(handle, params, &period_time, &dir);
+ 	if (err < 0) {
+ 		printf("Unable to set period time %i for playback: %s\n", period_time, snd_strerror(err));
+ 		return err;
+ 	}
+-	period_size = snd_pcm_hw_params_get_period_size(params, &dir);
++	snd_pcm_hw_params_get_period_size(params, &period_size, &dir);
+ 	/* write the parameters to device */
+ 	err = snd_pcm_hw_params(handle, params);
+ 	if (err < 0) {
+diff -uaNr madplay-0.15.2b.o/audio_alsa.c madplay-0.15.2b/audio_alsa.c
+--- madplay-0.15.2b.o/audio_alsa.c	2012-10-19 20:50:54.874259813 +0200
++++ madplay-0.15.2b/audio_alsa.c	2012-10-19 21:03:09.838230951 +0200
+@@ -44,7 +44,7 @@
+ 
+ int buffer_time		= 500000;
+ int period_time		= 100000;
+-char *defaultdev	= "plughw:0,0";
++char *defaultdev	= "default";
+ 
+ snd_pcm_hw_params_t *alsa_hwparams;
+ snd_pcm_sw_params_t *alsa_swparams;
+diff -uaNr madplay-0.15.2b.o/audio_alsa.c madplay-0.15.2b/audio_alsa.c
+--- madplay-0.15.2b.o/audio_alsa.c	2012-10-19 20:50:54.874259813 +0200
++++ madplay-0.15.2b/audio_alsa.c	2012-10-19 21:13:29.486206440 +0200
+@@ -85,13 +85,14 @@
+ 		return err;
+ 	}
+ 	/* set the stream rate */
++  printf(stderr, "Trying rate %iHz.\n", rate);
+ 	err = snd_pcm_hw_params_set_rate_near(handle, params, &rate, 0);
+ 	if (err < 0) {
+-		printf("Rate %iHz not available for playback: %s\n", rate, snd_strerror(err));
+-		return err;
++		printf("Neares rate %iHz is lower: %s\n", rate, snd_strerror(err));
++		return -EINVAL;
+ 	}
+-	if (err != rate) {
+-		printf("Rate doesn't match (requested %iHz, get %iHz)\n", rate, err);
++	if (err > 0) {
++		printf("Neares rate %iHz is higher: %s\n", rate, snd_strerror(err));
+ 		return -EINVAL;
+ 	}
+ 	/* set buffer time */

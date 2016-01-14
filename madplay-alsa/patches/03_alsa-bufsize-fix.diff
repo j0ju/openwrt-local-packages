@@ -1,0 +1,20 @@
+--- madplay-0.15.2b.orig/audio_alsa.c	2004-02-23 16:35:23.000000000 -0500
++++ madplay-0.15.2b/audio_alsa.c	2012-04-04 00:07:44.965023179 -0400
+@@ -241,7 +241,7 @@
+ 		return -1;
+ 	}
+ 
+-	buf = malloc(buffer_size);
++	buf = malloc(MAX_NSAMPLES * 4 * 2);
+ 	if (buf == NULL) {
+ 		audio_error="unable to allocate output buffer table";
+ 		return -1;
+@@ -343,6 +343,8 @@
+ 		audio_error = snd_strerror(err);
+ 		return -1;
+ 	}
++	
++	free(buf);
+ 
+ 	return 0;
+ 
