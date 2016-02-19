@@ -9,12 +9,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=go
-PKG_VERSION:=1.5.2
+PKG_VERSION:=1.6
 PKG_RELEASE:=1
 
 PKG_SOURCE:=go$(PKG_VERSION).src.tar.gz
 PKG_SOURCE_URL:=https://storage.googleapis.com/golang/
-PKG_MD5SUM:=38fed22e7b80672291e7cba7fb9c3475
+PKG_MD5SUM:=e67833ea37fbc002fbe38efe6c1bcd98
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
