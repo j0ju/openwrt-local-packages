@@ -1,0 +1,11 @@
+diff -uaNr lirc-0.9.3a.o/lib/lirc_client.c lirc-0.9.3a/lib/lirc_client.c
+--- lirc-0.9.3a.o/lib/lirc_client.c	2015-10-14 18:23:44.000000000 +0200
++++ lirc-0.9.3a/lib/lirc_client.c	2016-03-06 19:44:48.582047300 +0100
+@@ -35,6 +35,7 @@
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <sys/un.h>
++#include <sys/wait.h>
+ #include <unistd.h>
+ 
+ #include "lirc_client.h"
