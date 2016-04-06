@@ -1,0 +1,47 @@
+diff -uaNr autofs-5.1.1.o/Makefile.conf.in autofs-5.1.1/Makefile.conf.in
+--- autofs-5.1.1.o/Makefile.conf.in	2016-04-06 17:07:57.604021941 +0200
++++ autofs-5.1.1/Makefile.conf.in	2016-04-06 17:14:45.374041909 +0200
+@@ -21,30 +21,30 @@
+ HESIOD_FLAGS = @HESIOD_FLAGS@
+ 
+ # LDAP support: yes (1) no (0)
+-LDAP = @HAVE_LDAP@
+-LIBLDAP= @LIBLDAP@
+-LDAP_FLAGS = @LDAP_FLAGS@
++LDAP = 0
++LIBLDAP=
++LDAP_FLAGS =
+ 
+ # sssd support
+-SSSD = @HAVE_SSS_AUTOFS@
++SSSD =
+ 
+ # SASL support: yes (1) no (0)
+-XML_LIBS = @XML_LIBS@
+-XML_FLAGS = @XML_FLAGS@
+-SASL = @HAVE_SASL@
+-LIBSASL= @LIBSASL@
+-SASL_FLAGS = @SASL_FLAGS@
+-KRB5_LIBS=@KRB5_LIBS@
+-KRB5_FLAGS=@KRB5_FLAGS@
++XML_LIBS =
++XML_FLAGS =
++SASL = 0
++LIBSASL=
++SASL_FLAGS =
++KRB5_LIBS=
++KRB5_FLAGS=
+ 
+ # NIS+ support: yes (1) no (0)
+-NISPLUS = @HAVE_NISPLUS@
++NISPLUS = 0
+ 
+ # SMBFS support: yes (1) no (0)
+ SMBFS = 0
+ 
+ # YellowPages support: yes (1) no (0)
+-YPCLNT = @HAVE_YPCLNT@
++YPCLNT = 0
+ 
+ # Support for calling e2fsck when mounting ext2 filesystems
+ EXT2FS = @HAVE_E2FSCK@

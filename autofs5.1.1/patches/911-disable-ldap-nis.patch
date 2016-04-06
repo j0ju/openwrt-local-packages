@@ -1,0 +1,20 @@
+diff -uaNr autofs-5.1.1.o/include/config.h.in autofs-5.1.1/include/config.h.in
+--- autofs-5.1.1.o/include/config.h.in	2015-04-21 11:37:45.000000000 +0200
++++ autofs-5.1.1/include/config.h.in	2016-04-06 17:23:47.285247657 +0200
+@@ -151,13 +151,13 @@
+ #undef WITH_DMALLOC
+ 
+ /* Define if using Hesiod as a source of automount maps */
+-#undef WITH_HESIOD
++//#undef WITH_HESIOD
+ 
+ /* Define if using LDAP as a source of automount maps */
+-#undef WITH_LDAP
++//#undef WITH_LDAP
+ 
+ /* Define to 1 if you have the libtirpc library installed */
+ #undef WITH_LIBTIRPC
+ 
+ /* Define if using SASL authentication with the LDAP module */
+-#undef WITH_SASL
++//#undef WITH_SASL
