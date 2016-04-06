@@ -25,7 +25,6 @@ define Package/mtools
   TITLE:=mtools
   SECTION:=admin
   CATEGORY:=Administration
-  DEPENDS+=libbsd
 endef
 
 define Package/mtools/install
