@@ -25,7 +25,7 @@ define Package/autofs5
 	CATEGORY:=Utilities
 	TITLE:=Autofs
 	URL:=http://kernel.org/
-	DEPENDS:=+libpthread
+	DEPENDS:=+libpthread +librpc
 endef
 
 define Package/autofs5/description

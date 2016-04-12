@@ -5,13 +5,14 @@ Description: avoid dropping LDFLAGS to fix "hardening-no-relro"
 
 --- a/Makefile.rules
 +++ b/Makefile.rules
-@@ -39,9 +39,9 @@
+@@ -39,9 +39,10 @@
  CC        ?= gcc
  CXX       ?= g++
  CXXFLAGS  ?= $(CFLAGS)
  LD        ?= ld
 -SOLDFLAGS = -shared
 +SOLDFLAGS = $(LDFLAGS) -shared
++LIBS += -lrpc
  
  CFLAGS += -D_REENTRANT -D_FILE_OFFSET_BITS=64
  LIBS += -lpthread
