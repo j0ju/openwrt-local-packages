@@ -1,0 +1,93 @@
+Index: redis-4.0.1/deps/jemalloc/src/pages.c
+===================================================================
+--- redis-4.0.1.orig/deps/jemalloc/src/pages.c
++++ redis-4.0.1/deps/jemalloc/src/pages.c
+@@ -146,28 +146,7 @@ bool
+ pages_purge(void *addr, size_t size)
+ {
+ 	bool unzeroed;
+-
+-#ifdef _WIN32
+-	VirtualAlloc(addr, size, MEM_RESET, PAGE_READWRITE);
+-	unzeroed = true;
+-#elif defined(JEMALLOC_HAVE_MADVISE)
+-#  ifdef JEMALLOC_PURGE_MADVISE_DONTNEED
+-#    define JEMALLOC_MADV_PURGE MADV_DONTNEED
+-#    define JEMALLOC_MADV_ZEROS true
+-#  elif defined(JEMALLOC_PURGE_MADVISE_FREE)
+-#    define JEMALLOC_MADV_PURGE MADV_FREE
+-#    define JEMALLOC_MADV_ZEROS false
+-#  else
+-#    error "No madvise(2) flag defined for purging unused dirty pages."
+-#  endif
+-	int err = madvise(addr, size, JEMALLOC_MADV_PURGE);
+-	unzeroed = (!JEMALLOC_MADV_ZEROS || err != 0);
+-#  undef JEMALLOC_MADV_PURGE
+-#  undef JEMALLOC_MADV_ZEROS
+-#else
+-	/* Last resort no-op. */
+-	unzeroed = true;
+-#endif
++	unzeroed = false;
+ 	return (unzeroed);
+ }
+ 
+Index: redis-4.0.1/src/Makefile
+===================================================================
+--- redis-4.0.1.orig/src/Makefile
++++ redis-4.0.1/src/Makefile
+@@ -177,7 +177,6 @@ persist-settings: distclean
+ 	echo REDIS_LDFLAGS=$(REDIS_LDFLAGS) >> .make-settings
+ 	echo PREV_FINAL_CFLAGS=$(FINAL_CFLAGS) >> .make-settings
+ 	echo PREV_FINAL_LDFLAGS=$(FINAL_LDFLAGS) >> .make-settings
+-	-(cd ../deps && $(MAKE) $(DEPENDENCY_TARGETS))
+ 
+ .PHONY: persist-settings
+ 
+@@ -228,12 +227,11 @@ dict-benchmark: dict.c zmalloc.c sds.c s
+ 	$(REDIS_CC) -c $<
+ 
+ clean:
+-	rm -rf $(REDIS_SERVER_NAME) $(REDIS_SENTINEL_NAME) $(REDIS_CLI_NAME) $(REDIS_BENCHMARK_NAME) $(REDIS_CHECK_RDB_NAME) $(REDIS_CHECK_AOF_NAME) *.o *.gcda *.gcno *.gcov redis.info lcov-html Makefile.dep dict-benchmark
++	$(info "prevent dist  clean")
+ 
+ .PHONY: clean
+ 
+ distclean: clean
+-	-(cd ../deps && $(MAKE) distclean)
+ 	-(rm -f .make-*)
+ 
+ .PHONY: distclean
+@@ -283,10 +281,3 @@ src/help.h:
+ 	@../utils/generate-command-help.rb > help.h
+ 
+ install: all
+-	@mkdir -p $(INSTALL_BIN)
+-	$(REDIS_INSTALL) $(REDIS_SERVER_NAME) $(INSTALL_BIN)
+-	$(REDIS_INSTALL) $(REDIS_BENCHMARK_NAME) $(INSTALL_BIN)
+-	$(REDIS_INSTALL) $(REDIS_CLI_NAME) $(INSTALL_BIN)
+-	$(REDIS_INSTALL) $(REDIS_CHECK_RDB_NAME) $(INSTALL_BIN)
+-	$(REDIS_INSTALL) $(REDIS_CHECK_AOF_NAME) $(INSTALL_BIN)
+-	@ln -sf $(REDIS_SERVER_NAME) $(INSTALL_BIN)/$(REDIS_SENTINEL_NAME)
+Index: redis-4.0.1/src/atomicvar.h
+===================================================================
+--- redis-4.0.1.orig/src/atomicvar.h
++++ redis-4.0.1/src/atomicvar.h
+@@ -68,7 +68,7 @@
+  * is reported. */
+ // #define __ATOMIC_VAR_FORCE_SYNC_MACROS
+ 
+-#if !defined(__ATOMIC_VAR_FORCE_SYNC_MACROS) && defined(__ATOMIC_RELAXED) && !defined(__sun) && (!defined(__clang__) || !defined(__APPLE__) || __apple_build_version__ > 4210057)
++#if defined(CONFIG_EDAC_ATOMIC_SCRUB) &&  !defined(__ATOMIC_VAR_FORCE_SYNC_MACROS) && defined(__ATOMIC_RELAXED) && !defined(__sun) && (!defined(__clang__) || !defined(__APPLE__) || __apple_build_version__ > 4210057)
+ /* Implementation using __atomic macros. */
+ 
+ #define atomicIncr(var,count) __atomic_add_fetch(&var,(count),__ATOMIC_RELAXED)
+@@ -82,7 +82,7 @@
+ #define atomicSet(var,value) __atomic_store_n(&var,value,__ATOMIC_RELAXED)
+ #define REDIS_ATOMIC_API "atomic-builtin"
+ 
+-#elif defined(HAVE_ATOMIC)
++#elif defined(CONFIG_EDAC_ATOMIC_SCRUB) && defined(HAVE_ATOMIC)
+ /* Implementation using __sync macros. */
+ 
+ #define atomicIncr(var,count) __sync_add_and_fetch(&var,(count))
