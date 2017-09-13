@@ -47,7 +47,19 @@ CONFIGURE_VARS += \
 	CPPFLAGS="$(TARGET_CPPFLAGS)" \
 #
 
+define Package/carbon-c-relay/conffiles
+/etc/carbon-c-relay.conf
+/etc/init.d/carbon-c-relay
+endef
+
+
 define Package/carbon-c-relay/install
+	$(INSTALL_DIR) $(1)/etc
+	$(INSTALL_CONF) ./files/carbon-c-relay.conf $(1)/etc/carbon-c-relay.conf
+	#
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/carbon-c-relay.init $(1)/etc/init.d/carbon-c-relay
+	#
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/relay $(1)/usr/bin/carbon-c-relay
 endef

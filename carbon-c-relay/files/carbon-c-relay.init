@@ -1,0 +1,25 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2017 Joerg Jungermann
+
+START=99
+STOP=10
+
+USE_PROCD=1
+
+BIN="/usr/bin/carbon-c-relay"
+CONF="/etc/carbon-c-relay.conf"
+
+OPTS=
+OPTS="$OPTS -p 2003"
+OPTS="$OPTS -s"
+OPTS="$OPTS -b 10"
+OPTS="$OPTS -q 10000"
+
+start_service() {
+  procd_open_instance
+  procd_set_param command "$BIN"
+  procd_append_param command -f $CONF $OPTS
+  procd_set_param respawn
+  procd_close_instance
+}
+
