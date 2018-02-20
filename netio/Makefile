@@ -19,7 +19,7 @@ define Package/netio
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=Buffer
-  DEPENDS:=+libpthread
+  DEPENDS:=+libpthread +libc
 endef
 
 define Package/netio/description
