@@ -1,0 +1,12 @@
+diff -uaNr keepalived-1.2.19.o/keepalived/vrrp/vrrp_netlink.c keepalived-1.2.19/keepalived/vrrp/vrrp_netlink.c
+--- keepalived-1.2.19/keepalived/core/keepalived_netlink.c	2018-01-07 18:29:33.855558347 +0100
++++ keepalived-1.2.19/keepalived/core/keepalived_netlink.c	2018-01-28 22:28:40.559556823 +0100
+@@ -337,7 +337,7 @@
+ 
+ 			error = (*filter) (&snl, h);
+ 			if (error < 0) {
+-				log_message(LOG_INFO, "Netlink: filter function error");
++				//log_message(LOG_INFO, "Netlink: filter function error");
+ 				ret = error;
+ 			}
+ 		}
