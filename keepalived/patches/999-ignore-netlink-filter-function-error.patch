@@ -1,7 +1,9 @@
-diff -uaNr keepalived-1.2.19.o/keepalived/vrrp/vrrp_netlink.c keepalived-1.2.19/keepalived/vrrp/vrrp_netlink.c
---- keepalived-1.2.19/keepalived/core/keepalived_netlink.c	2018-01-07 18:29:33.855558347 +0100
-+++ keepalived-1.2.19/keepalived/core/keepalived_netlink.c	2018-01-28 22:28:40.559556823 +0100
-@@ -337,7 +337,7 @@
+Keepalived produces a lot of netlink filter errors when OpenWRT hotplugs interfaces.
+Ignore it.
+
+--- keepalived-1.4.1/keepalived/core/keepalived_netlink.c	2018-01-27 11:17:28.000000000 +0100
++++ keepalived-1.4.1.o/keepalived/core/keepalived_netlink.c	2018-02-21 11:11:16.876038546 +0100
+@@ -729,7 +729,7 @@
  
  			error = (*filter) (&snl, h);
  			if (error < 0) {
@@ -9,4 +11,4 @@ diff -uaNr keepalived-1.2.19.o/keepalived/vrrp/vrrp_netlink.c keepalived-1.2.19/
 +				//log_message(LOG_INFO, "Netlink: filter function error");
  				ret = error;
  			}
- 		}
+ 

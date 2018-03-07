@@ -1,0 +1,35 @@
+Scope definition was disabled for IPv6 addresses in 1.3+,
+allow this again to set scope of addresses in fe80::/64 correctly.
+
+--- keepalived-1.4.1/keepalived/vrrp/vrrp_print.c	2018-01-27 11:17:28.000000000 +0100
++++ keepalived-1.4.1.o/keepalived/vrrp/vrrp_print.c	2018-02-21 11:12:46.522342948 +0100
+@@ -134,8 +134,8 @@
+ 		, ipaddr->ifa.ifa_prefixlen
+ 		, broadcast
+ 		, IF_NAME(ipaddr->ifp)
+-		, IP_IS4(ipaddr) ? " scope " : ""
+-		, IP_IS4(ipaddr) ? get_rttables_scope(ipaddr->ifa.ifa_scope) : ""
++		, " scope "
++		, get_rttables_scope(ipaddr->ifa.ifa_scope)
+ 		, ipaddr->label ? " label " : ""
+ 		, ipaddr->label ? ipaddr->label : "");
+ }
+--- keepalived-1.4.1/keepalived/vrrp/vrrp_ipaddress.c	2018-01-27 11:17:28.000000000 +0100
++++ keepalived-1.4.1.o/keepalived/vrrp/vrrp_ipaddress.c	2018-02-21 10:58:21.334000812 +0100
+@@ -625,10 +625,12 @@
+ 	}
+ 
+ 	if (new->ifa.ifa_family == AF_INET6) {
+-		if (new->ifa.ifa_scope) {
+-			log_message(LOG_INFO, "Cannot specify scope for IPv6 addresses (%s) - ignoring scope", FMT_STR_VSLOT(strvec, addr_idx));
+-			new->ifa.ifa_scope = 0;
+-		}
++  /* reenable scope for IPv6 again
++	 *	if (new->ifa.ifa_scope) {
++	 *		log_message(LOG_INFO, "Cannot specify scope for IPv6 addresses (%s) - ignoring scope", FMT_STR_VSLOT(strvec, addr_idx));
++	 *		new->ifa.ifa_scope = 0;
++	 *	}
++   */
+ 		if (new->label) {
+ 			log_message(LOG_INFO, "Cannot specify label for IPv6 addresses (%s) - ignoring label", FMT_STR_VSLOT(strvec, addr_idx));
+ 			FREE(new->label);
